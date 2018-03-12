@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "67E2868E20569CD5002B9160"
-               BuildableName = "Debuggable_iOS.framework"
+               BuildableName = "Debuggable.framework"
                BlueprintName = "Debuggable iOS"
                ReferencedContainer = "container:Debuggable.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "67E2868E20569CD5002B9160"
-            BuildableName = "Debuggable_iOS.framework"
+            BuildableName = "Debuggable.framework"
             BlueprintName = "Debuggable iOS"
             ReferencedContainer = "container:Debuggable.xcodeproj">
          </BuildableReference>
@@ -67,7 +67,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "67E2868E20569CD5002B9160"
-            BuildableName = "Debuggable_iOS.framework"
+            BuildableName = "Debuggable.framework"
             BlueprintName = "Debuggable iOS"
             ReferencedContainer = "container:Debuggable.xcodeproj">
          </BuildableReference>
@@ -85,7 +85,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "67E2868E20569CD5002B9160"
-            BuildableName = "Debuggable_iOS.framework"
+            BuildableName = "Debuggable.framework"
             BlueprintName = "Debuggable iOS"
             ReferencedContainer = "container:Debuggable.xcodeproj">
          </BuildableReference>

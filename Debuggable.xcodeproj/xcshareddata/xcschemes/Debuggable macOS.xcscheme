@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "67E286D420569D07002B9160"
-               BuildableName = "Debuggable_macOS.framework"
+               BuildableName = "Debuggable.framework"
                BlueprintName = "Debuggable macOS"
                ReferencedContainer = "container:Debuggable.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "67E286D420569D07002B9160"
-            BuildableName = "Debuggable_macOS.framework"
+            BuildableName = "Debuggable.framework"
             BlueprintName = "Debuggable macOS"
             ReferencedContainer = "container:Debuggable.xcodeproj">
          </BuildableReference>
@@ -67,7 +67,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "67E286D420569D07002B9160"
-            BuildableName = "Debuggable_macOS.framework"
+            BuildableName = "Debuggable.framework"
             BlueprintName = "Debuggable macOS"
             ReferencedContainer = "container:Debuggable.xcodeproj">
          </BuildableReference>
@@ -85,7 +85,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "67E286D420569D07002B9160"
-            BuildableName = "Debuggable_macOS.framework"
+            BuildableName = "Debuggable.framework"
             BlueprintName = "Debuggable macOS"
             ReferencedContainer = "container:Debuggable.xcodeproj">
          </BuildableReference>

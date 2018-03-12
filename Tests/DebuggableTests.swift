@@ -2,8 +2,6 @@
 //  DebuggableTests.swift
 //  DebuggableTests
 //
-//  Created by Amine Bensalah on 12/03/2018.
-//
 
 import XCTest
 @testable import Debuggable
