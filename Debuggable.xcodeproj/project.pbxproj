@@ -533,6 +533,7 @@
 		67E2868820569CB4002B9160 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 			};
 			name = Debug;
@@ -540,6 +541,7 @@
 		67E2868920569CB4002B9160 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 			};
 			name = Release;
