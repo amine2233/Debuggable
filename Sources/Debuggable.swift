@@ -1,3 +1,4 @@
+#if canImport(Foundation)
 import Foundation
 
 public protocol DebuggableProtocol {
@@ -7,14 +8,14 @@ public protocol DebuggableProtocol {
     /// - note: For example, an error named `FooError` will have the
     /// `readableName` `"Foo Error"`.
     static var readableName: String { get }
-    
+
     // MARK: Identifiers
-    
+
     /// A unique identifier for the error's Type.
     /// - note: This defaults to `ModuleName.TypeName`,
     /// and is used to create the `identifier` property.
     static var typeIdentifier: String { get }
-    
+
     /// Some unique identifier for this specific error.
     /// This will be used to create the `identifier` property.
     /// Do NOT use `String(reflecting: self)` or `String(describing: self)`
@@ -28,13 +29,13 @@ extension DebuggableProtocol {
     public static var typeIdentifier: String {
         return String(reflecting: self)
     }
-    
+
     /// Default implementation of readable name that expands
     /// SomeModule.MyType.Error => My Type Error
     public static var readableName: String {
         return typeIdentifier.readableTypeName()
     }
-    
+
     public var identifier: String {
         return String(describing: self)
     }
@@ -54,29 +55,29 @@ public protocol Debuggable: DebuggableProtocol {
     ///     // other cases
     ///     }
     var reason: String { get }
-    
+
     // MARK: Help
-    
+
     /// A `String` array describing the possible causes of the error.
     /// - note: Defaults to an empty array.
     /// Provide a custom implementation to give more context.
     var possibleCauses: [String] { get }
-    
+
     /// A `String` array listing some common fixes for the error.
     /// - note: Defaults to an empty array.
     /// Provide a custom implementation to be more helpful.
     var suggestedFixes: [String] { get }
-    
+
     /// An array of string `URL`s linking to documentation pertaining to the error.
     /// - note: Defaults to an empty array.
     /// Provide a custom implementation with relevant links.
     var documentationLinks: [String] { get }
-    
+
     /// An array of string `URL`s linking to related Stack Overflow questions.
     /// - note: Defaults to an empty array.
     /// Provide a custom implementation to link to useful questions.
     var stackOverflowQuestions: [String] { get }
-    
+
     /// An array of string `URL`s linking to related issues on Vapor's GitHub repo.
     /// - note: Defaults to an empty array.
     /// Provide a custom implementation to a list of pertinent issues.
@@ -89,11 +90,11 @@ extension Debuggable {
     public var documentationLinks: [String] {
         return []
     }
-    
+
     public var stackOverflowQuestions: [String] {
         return []
     }
-    
+
     public var gitHubIssues: [String] {
         return []
     }
@@ -119,20 +120,21 @@ extension String {
             .split(separator: ".")
             .dropFirst() // drop module
             .joined(separator: [])
-        
+
         let characters = Array(characterSequence)
         guard var expanded = characters.first.flatMap({ String($0) }) else { return "" }
-        
+
         characters.suffix(from: 1).forEach { char in
             if char.isUppercase {
                 expanded.append(" ")
             }
-            
+
             expanded.append(char)
         }
-        
+
         return expanded
     }
+
     private func toCharacterSequence() -> String {
         return self
     }
@@ -141,7 +143,7 @@ extension String {
 extension Character {
     var isUppercase: Bool {
         switch self {
-        case "A"..."Z":
+        case "A" ... "Z":
             return true
         default:
             return false
@@ -152,36 +154,37 @@ extension Character {
 extension Debuggable {
     public var printable: String {
         var print: [String] = []
-        
+
         print.append("\(Self.readableName): \(reason)")
         print.append("Identifier: \(fullIdentifier)")
-        
+
         if !possibleCauses.isEmpty {
             print.append("Here are some possible causes: \(possibleCauses.bulletedList)")
         }
-        
+
         if !suggestedFixes.isEmpty {
             print.append("These suggestions could address the issue: \(suggestedFixes.bulletedList)")
         }
-        
+
         if !documentationLinks.isEmpty {
             print.append("Vapor's documentation talks about this: \(documentationLinks.bulletedList)")
         }
-        
+
         if !stackOverflowQuestions.isEmpty {
             print.append("These Stack Overflow links might be helpful: \(stackOverflowQuestions.bulletedList)")
         }
-        
+
         if !gitHubIssues.isEmpty {
             print.append("See these Github issues for discussion on this topic: \(gitHubIssues.bulletedList)")
         }
-        
+
         return print.joined(separator: "\n\n")
     }
 }
 
 extension Sequence where Iterator.Element == String {
     var bulletedList: String {
-        return map { "\n- \($0)" } .joined()
+        return map { "\n- \($0)" }.joined()
     }
 }
+#endif
