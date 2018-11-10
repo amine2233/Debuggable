@@ -11,6 +11,14 @@
 		670DF2E82126124500BB1A9E /* SourceLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670DF2E62126124500BB1A9E /* SourceLocation.swift */; };
 		670DF2E92126124500BB1A9E /* SourceLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670DF2E62126124500BB1A9E /* SourceLocation.swift */; };
 		670DF2EA2126124500BB1A9E /* SourceLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670DF2E62126124500BB1A9E /* SourceLocation.swift */; };
+		67D72DCD2196E75100D1AA89 /* LoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DCC2196E75100D1AA89 /* LoggerService.swift */; };
+		67D72DCE2196E75900D1AA89 /* LoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DCC2196E75100D1AA89 /* LoggerService.swift */; };
+		67D72DCF2196E75B00D1AA89 /* LoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DCC2196E75100D1AA89 /* LoggerService.swift */; };
+		67D72DD02196E75C00D1AA89 /* LoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DCC2196E75100D1AA89 /* LoggerService.swift */; };
+		67D72DD22196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DD12196E94300D1AA89 /* LoggerServiceProtocol.swift */; };
+		67D72DD32196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DD12196E94300D1AA89 /* LoggerServiceProtocol.swift */; };
+		67D72DD42196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DD12196E94300D1AA89 /* LoggerServiceProtocol.swift */; };
+		67D72DD52196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D72DD12196E94300D1AA89 /* LoggerServiceProtocol.swift */; };
 		67E2869920569CD5002B9160 /* Debuggable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67E2868F20569CD5002B9160 /* Debuggable.framework */; };
 		67E286C220569CF6002B9160 /* Debuggable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67E286B920569CF5002B9160 /* Debuggable.framework */; };
 		67E286DE20569D07002B9160 /* Debuggable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67E286D520569D07002B9160 /* Debuggable.framework */; };
@@ -21,10 +29,6 @@
 		67E286FB2056A08B002B9160 /* DebuggableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E286F92056A08B002B9160 /* DebuggableTests.swift */; };
 		67E286FC2056A08B002B9160 /* DebuggableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E286F92056A08B002B9160 /* DebuggableTests.swift */; };
 		67E286FD2056A08B002B9160 /* DebuggableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E286F92056A08B002B9160 /* DebuggableTests.swift */; };
-		67E287032056A4A7002B9160 /* LoggerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287012056A4A7002B9160 /* LoggerManager.swift */; };
-		67E287042056A4A7002B9160 /* LoggerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287012056A4A7002B9160 /* LoggerManager.swift */; };
-		67E287052056A4A7002B9160 /* LoggerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287012056A4A7002B9160 /* LoggerManager.swift */; };
-		67E287062056A4A7002B9160 /* LoggerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287012056A4A7002B9160 /* LoggerManager.swift */; };
 		67E287072056A4A7002B9160 /* Debuggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287022056A4A7002B9160 /* Debuggable.swift */; };
 		67E287082056A4A7002B9160 /* Debuggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287022056A4A7002B9160 /* Debuggable.swift */; };
 		67E287092056A4A7002B9160 /* Debuggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E287022056A4A7002B9160 /* Debuggable.swift */; };
@@ -57,6 +61,8 @@
 
 /* Begin PBXFileReference section */
 		670DF2E62126124500BB1A9E /* SourceLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceLocation.swift; sourceTree = "<group>"; };
+		67D72DCC2196E75100D1AA89 /* LoggerService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerService.swift; sourceTree = "<group>"; };
+		67D72DD12196E94300D1AA89 /* LoggerServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerServiceProtocol.swift; sourceTree = "<group>"; };
 		67E2868F20569CD5002B9160 /* Debuggable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Debuggable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		67E2869820569CD5002B9160 /* Debuggable iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Debuggable iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		67E286AC20569CE9002B9160 /* Debuggable.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Debuggable.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,7 +74,6 @@
 		67E286EE20569D4D002B9160 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		67E286F92056A08B002B9160 /* DebuggableTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebuggableTests.swift; sourceTree = "<group>"; };
 		67E286FA2056A08B002B9160 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		67E287012056A4A7002B9160 /* LoggerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerManager.swift; sourceTree = "<group>"; };
 		67E287022056A4A7002B9160 /* Debuggable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debuggable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -154,11 +159,12 @@
 		67E286EC20569D4D002B9160 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				67D72DCC2196E75100D1AA89 /* LoggerService.swift */,
 				67E287022056A4A7002B9160 /* Debuggable.swift */,
-				67E287012056A4A7002B9160 /* LoggerManager.swift */,
 				67E286ED20569D4D002B9160 /* Debuggable.h */,
 				67E286EE20569D4D002B9160 /* Info.plist */,
 				670DF2E62126124500BB1A9E /* SourceLocation.swift */,
+				67D72DD12196E94300D1AA89 /* LoggerServiceProtocol.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -462,8 +468,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				670DF2E72126124500BB1A9E /* SourceLocation.swift in Sources */,
-				67E287032056A4A7002B9160 /* LoggerManager.swift in Sources */,
+				67D72DD22196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */,
 				67E287072056A4A7002B9160 /* Debuggable.swift in Sources */,
+				67D72DCD2196E75100D1AA89 /* LoggerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,8 +487,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				670DF2E82126124500BB1A9E /* SourceLocation.swift in Sources */,
-				67E287042056A4A7002B9160 /* LoggerManager.swift in Sources */,
+				67D72DD32196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */,
 				67E287082056A4A7002B9160 /* Debuggable.swift in Sources */,
+				67D72DCE2196E75900D1AA89 /* LoggerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,8 +498,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				670DF2E92126124500BB1A9E /* SourceLocation.swift in Sources */,
-				67E287052056A4A7002B9160 /* LoggerManager.swift in Sources */,
+				67D72DD42196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */,
 				67E287092056A4A7002B9160 /* Debuggable.swift in Sources */,
+				67D72DCF2196E75B00D1AA89 /* LoggerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,8 +517,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				670DF2EA2126124500BB1A9E /* SourceLocation.swift in Sources */,
-				67E287062056A4A7002B9160 /* LoggerManager.swift in Sources */,
+				67D72DD52196E94300D1AA89 /* LoggerServiceProtocol.swift in Sources */,
 				67E2870A2056A4A7002B9160 /* Debuggable.swift in Sources */,
+				67D72DD02196E75C00D1AA89 /* LoggerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

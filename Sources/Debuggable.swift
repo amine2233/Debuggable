@@ -1,7 +1,7 @@
 #if canImport(Foundation)
 import Foundation
 
-public protocol DebuggableProtocol {
+public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertible, LocalizedError {
     /// A readable name for the error's Type. This is usually
     /// similar to the Type name of the error with spaces added.
     /// This will normally be printed proceeding the error's reason.
@@ -21,27 +21,6 @@ public protocol DebuggableProtocol {
     /// Do NOT use `String(reflecting: self)` or `String(describing: self)`
     /// or there will be infinite recursion
     var identifier: String { get }
-}
-
-/// `Debuggable` provides an interface that allows a type
-/// to be more easily debugged in the case of an error.
-extension DebuggableProtocol {
-    public static var typeIdentifier: String {
-        return String(reflecting: self)
-    }
-
-    /// Default implementation of readable name that expands
-    /// SomeModule.MyType.Error => My Type Error
-    public static var readableName: String {
-        return typeIdentifier.readableTypeName()
-    }
-
-    public var identifier: String {
-        return String(describing: self)
-    }
-}
-
-public protocol Debuggable: DebuggableProtocol {
     
     /// Optional source location for this error
     var sourceLocation: SourceLocation? { get }
@@ -91,29 +70,40 @@ public protocol Debuggable: DebuggableProtocol {
     var gitHubIssues: [String] { get }
 }
 
+/// `Debuggable` provides an interface that allows a type
+/// to be more easily debugged in the case of an error.
+extension Debuggable {
+    public static var typeIdentifier: String {
+        let type = String(reflecting: self)
+        return type.split(separator: ".").last.flatMap(String.init) ?? type
+    }
+    
+    /// Default implementation of readable name that expands
+    /// SomeModule.MyType.Error => My Type Error
+    public static var readableName: String {
+        return typeIdentifier.readableTypeName()
+    }
+    
+    public var identifier: String {
+        return String(describing: self)
+    }
+}
+
 extension Debuggable {
     public var fullIdentifier: String {
         return Self.typeIdentifier + "." + identifier
     }
 }
 
-// MARK: Optionals
 extension Debuggable {
     /// Generates a stack trace from the call point. Must call this from the error's init.
     public static func makeStackTrace() -> [String] {
         return Thread.callStackSymbols
     }
-    
-    /// See `Debuggable`
-    public static var readableName: String {
-        return typeIdentifier
-    }
-    
-    /// See `Debuggable`
-    public static var typeIdentifier: String {
-        let type = "\(self)"
-        return type.split(separator: ".").last.flatMap(String.init) ?? type
-    }
+}
+
+// MARK: Optionals
+extension Debuggable {
     
     /// See `Debuggable`
     public var possibleCauses: [String] {
