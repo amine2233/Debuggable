@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 		s.name 				= "Debuggable"
-		s.version 			= "3.0.0"
+		s.version 			= "3.1.0"
 		s.summary         	= "Sort description of 'Debuggable' framework"
 	    s.homepage        	= "https://github.com/amine2233/Debuggable"
 	    s.license           = "MIT"

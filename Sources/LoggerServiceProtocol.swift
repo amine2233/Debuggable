@@ -75,22 +75,22 @@ public protocol LoggerServiceProtocol: class {
     /**
      Log function
      */
-    func log(message: CustomStringConvertible, level: LoggerLevel, file: String, line: UInt, column: UInt, function: String)
+    func log(_ message: @autoclosure () -> String, level: LoggerLevel, file: String, line: UInt, column: UInt, function: String)
     
     /**
      Log function with context
      */
-    func log(message: CustomStringConvertible, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation)
+    func log(_ message: @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation)
     
     /**
      Simple debug info
      */
-    func debug(message: CustomStringConvertible, level: LoggerLevel)
+    func debug(_ message: @autoclosure () -> String, level: LoggerLevel)
     
     /**
      Debug information for debuggable protocol
      */
-    func debug(error: Debuggable)
+    func debug(_ error: Debuggable)
 }
 
 extension LoggerServiceProtocol {
@@ -105,32 +105,32 @@ extension LoggerServiceProtocol {
         return []
     }
     
-    public func log(message: CustomStringConvertible, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
+    public func log(_ message: @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
         var debug = "[\(name)]"
         if let bundleIdentifier = self.bundleIdentifier {
             debug += "[\(bundleIdentifier)]"
         }
-        debug += "[\(Date().toLoggerString)] \(level.rawValue) [\(file.sourcefile)] : [\(line):\(column)] \(function) -> \(message)"
+        debug += "[\(Date().toLoggerString)] \(level.rawValue) [\(file.sourcefile)] : [\(line):\(column):\(function)]\n\(message())"
         
-        debugPrint(debug)
+        print(debug)
     }
     
-    public func log(message: CustomStringConvertible, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation) {
+    public func log(_ message: @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation) {
         var debug = "[\(name)]"
         if let bundleIdentifier = self.bundleIdentifier {
             debug += "[\(bundleIdentifier)]"
         }
-        debug += "[\(Date().toLoggerString)] \(level.rawValue) [\(sourceLocation.file.sourcefile)] : [\(context.name)]: [\(sourceLocation.line):\(sourceLocation.column)] \(sourceLocation.function) -> \(message)"
+        debug += "[\(Date().toLoggerString)] \(level.rawValue) [\(sourceLocation.file.sourcefile)] : [\(context.name)]: [\(sourceLocation.line):\(sourceLocation.column):\(sourceLocation.function)]\n\(message())"
         
-        debugPrint(debug)
+        print(debug)
     }
     
-    public func debug(message: CustomStringConvertible, level: LoggerLevel) {
-        self.log(message: message, level: level, file: #file, line: #line, column: #column, function: #function)
+    public func debug(_ message: @autoclosure () -> String, level: LoggerLevel) {
+        self.log(message, level: level, file: #file, line: #line, column: #column, function: #function)
     }
     
-    public func debug(error: Debuggable) {
-        debugPrint(error.debugDescription)
+    public func debug(_ error: Debuggable) {
+        print(error.debugDescription)
     }
 }
 #endif
