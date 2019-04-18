@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 		s.name 				= "Debuggable"
-		s.version 			= "3.1.0"
+		s.version 			= "4.0.0"
 		s.summary         	= "Sort description of 'Debuggable' framework"
 	    s.homepage        	= "https://github.com/amine2233/Debuggable"
 	    s.license           = "MIT"
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
 	    s.source            = { :git => "https://github.com/amine2233/Debuggable.git", :tag => s.version.to_s }
 	    s.source_files      = "Sources/**/*.swift"
   		s.module_name = s.name
-  		s.swift_version = '4.2'
+  		s.swift_version = '5.0'
   		s.pod_target_xcconfig = {
     		'SWIFT_VERSION' => s.swift_version
   		}

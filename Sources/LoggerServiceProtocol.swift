@@ -126,7 +126,7 @@ extension LoggerServiceProtocol {
     }
     
     public func debug(_ message: @autoclosure () -> String, level: LoggerLevel) {
-        self.log(message, level: level, file: #file, line: #line, column: #column, function: #function)
+        self.log(message(), level: level, file: #file, line: #line, column: #column, function: #function)
     }
     
     public func debug(_ error: Debuggable) {
