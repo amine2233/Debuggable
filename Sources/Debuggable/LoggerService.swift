@@ -134,7 +134,7 @@ extension Date {
 extension String {
     var sourcefile: String {
         let components = self.components(separatedBy: "/")
-        return components.isEmpty ? "" : components.last!
+        return components.isEmpty ? "" : components.last ?? ""
     }
 }
 #endif
