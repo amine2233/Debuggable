@@ -1,6 +1,8 @@
 #if canImport(Foundation)
 import Foundation
 
+/// `Debuggable` provides an interface that allows a type
+/// to be more easily debugged in the case of an error.
 public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertible, LocalizedError {
     /// A readable name for the error's Type. This is usually
     /// similar to the Type name of the error with spaces added.
@@ -8,8 +10,6 @@ public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertibl
     /// - note: For example, an error named `FooError` will have the
     /// `readableName` `"Foo Error"`.
     static var readableName: String { get }
-
-    // MARK: Identifiers
 
     /// A unique identifier for the error's Type.
     /// - note: This defaults to `ModuleName.TypeName`,
@@ -21,28 +21,15 @@ public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertibl
     /// Do NOT use `String(reflecting: self)` or `String(describing: self)`
     /// or there will be infinite recursion
     var identifier: String { get }
-    
-    /// Optional source location for this error
-    var sourceLocation: SourceLocation? { get }
-    
-    /// Stack trace from which this error originated (must set this from the error's init)
-    var stackTrace: [String]? { get }
-    
-    /// The reason for the error.
-    /// Typical implementations will switch over `self`
-    /// and return a friendly `String` describing the error.
-    /// - note: It is most convenient that `self` be a `Swift.Error`.
-    ///
-    /// Here is one way to do this:
-    ///
-    ///     switch self {
-    ///     case someError:
-    ///        return "A `String` describing what went wrong including the actual error: `Error.someError`."
-    ///     // other cases
-    ///     }
+
+    /// The reason for the error. Usually one sentence (that should end with a period).
     var reason: String { get }
 
-    // MARK: Help
+    /// Optional source location for this error
+    var sourceLocation: SourceLocation? { get }
+
+    /// Stack trace from which this error originated (must set this from the error's init)
+    var stackTrace: [String]? { get }
 
     /// A `String` array describing the possible causes of the error.
     /// - note: Defaults to an empty array.
@@ -70,22 +57,12 @@ public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertibl
     var gitHubIssues: [String] { get }
 }
 
-/// `Debuggable` provides an interface that allows a type
-/// to be more easily debugged in the case of an error.
+
+/// MARK: Computed
 extension Debuggable {
-    public static var typeIdentifier: String {
-        let type = String(reflecting: self)
-        return type.split(separator: ".").last.flatMap(String.init) ?? type
-    }
-    
-    /// Default implementation of readable name that expands
-    /// SomeModule.MyType.Error => My Type Error
-    public static var readableName: String {
-        return typeIdentifier.readableTypeName()
-    }
-    
-    public var identifier: String {
-        return String(describing: self)
+    /// Generates a stack trace from the call point. Must call this from the error's init.
+    public static func makeStackTrace() -> [String] {
+        return Thread.callStackSymbols
     }
 }
 
@@ -95,60 +72,62 @@ extension Debuggable {
     }
 }
 
+// MARK: Defaults
 extension Debuggable {
-    /// Generates a stack trace from the call point. Must call this from the error's init.
-    public static func makeStackTrace() -> [String] {
-        return Thread.callStackSymbols
+    /// See `Debuggable`
+    public static var readableName: String {
+        return typeIdentifier
     }
-}
 
-// MARK: Optionals
-extension Debuggable {
-    
+    /// See `Debuggable`
+    public static var typeIdentifier: String {
+        let type = "\(self)"
+        return type.split(separator: ".").last.flatMap(String.init) ?? type
+    }
+
     /// See `Debuggable`
     public var possibleCauses: [String] {
         return []
     }
-    
+
     /// See `Debuggable`
     public var suggestedFixes: [String] {
         return []
     }
-    
+
     /// See `Debuggable`
     public var documentationLinks: [String] {
         return []
     }
-    
+
     /// See `Debuggable`
     public var stackOverflowQuestions: [String] {
         return []
     }
-    
+
     /// See `Debuggable`
     public var gitHubIssues: [String] {
         return []
     }
-    
+
     /// See `Debuggable`
     public var sourceLocation: SourceLocation? {
         return nil
     }
-    
+
     /// See `Debuggable`
     public var stackTrace: [String]? {
         return nil
     }
 }
 
-// MARK: Defaults
-
+/// MARK: Custom...StringConvertible
 extension Debuggable {
     /// See `CustomDebugStringConvertible`
     public var debugDescription: String {
         return debuggableHelp(format: .long)
     }
-    
+
     /// See `CustomStringConvertible`
     public var description: String {
         return debuggableHelp(format: .short)
@@ -159,54 +138,19 @@ extension Debuggable {
 extension Debuggable {
     /// A localized message describing what error occurred.
     public var errorDescription: String? { return description }
-    
+
     /// A localized message describing the reason for the failure.
     public var failureReason: String? { return reason }
-    
+
     /// A localized message describing how one might recover from the failure.
     public var recoverySuggestion: String? { return suggestedFixes.first }
-    
+
     /// A localized message providing "help" text if the user requests help.
     public var helpAnchor: String? { return documentationLinks.first }
 }
 
-extension String {
-    func readableTypeName() -> String {
-        let characterSequence = toCharacterSequence()
-            .split(separator: ".")
-            .dropFirst() // drop module
-            .joined(separator: [])
 
-        let characters = Array(characterSequence)
-        guard var expanded = characters.first.flatMap({ String($0) }) else { return "" }
-
-        characters.suffix(from: 1).forEach { char in
-            if char.isUppercase {
-                expanded.append(" ")
-            }
-
-            expanded.append(char)
-        }
-
-        return expanded
-    }
-
-    private func toCharacterSequence() -> String {
-        return self
-    }
-}
-
-extension Character {
-    var isUppercase: Bool {
-        switch self {
-        case "A" ... "Z":
-            return true
-        default:
-            return false
-        }
-    }
-}
-
+// MARK: Representations
 /// Available formatting options for generating debug info for `Debuggable` errors.
 public enum HelpFormat {
     case short
@@ -219,14 +163,14 @@ extension Debuggable {
     /// - note: This representation is best used with functions like print()
     public func debuggableHelp(format: HelpFormat) -> String {
         var print: [String] = []
-        
+
         switch format {
         case .long:
             print.append("⚠️ \(Self.readableName): \(reason)\n- id: \(fullIdentifier)")
         case .short:
             print.append("⚠️ [\(fullIdentifier): \(reason)]")
         }
-        
+
         if let source = sourceLocation {
             switch format {
             case .long:
@@ -248,25 +192,25 @@ extension Debuggable {
                 print.append(string)
             }
         }
-        
+
         switch format {
         case .long:
             if !possibleCauses.isEmpty {
                 print.append("Here are some possible causes: \(possibleCauses.bulletedList)")
             }
-            
+
             if !suggestedFixes.isEmpty {
                 print.append("These suggestions could address the issue: \(suggestedFixes.bulletedList)")
             }
-            
+
             if !documentationLinks.isEmpty {
                 print.append("Vapor's documentation talks about this: \(documentationLinks.bulletedList)")
             }
-            
+
             if !stackOverflowQuestions.isEmpty {
                 print.append("These Stack Overflow links might be helpful: \(stackOverflowQuestions.bulletedList)")
             }
-            
+
             if !gitHubIssues.isEmpty {
                 print.append("See these Github issues for discussion on this topic: \(gitHubIssues.bulletedList)")
             }
@@ -278,7 +222,7 @@ extension Debuggable {
                 print.append("[Suggested fixes: \(suggestedFixes.joined(separator: " "))]")
             }
         }
-        
+
         switch format {
         case .long:
             return print.joined(separator: "\n\n") + "\n"
@@ -288,9 +232,10 @@ extension Debuggable {
     }
 }
 
+
 extension Sequence where Iterator.Element == String {
     var bulletedList: String {
-        return map { "\n- \($0)" }.joined()
+        return map { "\n- \($0)" } .joined()
     }
 }
 #endif
