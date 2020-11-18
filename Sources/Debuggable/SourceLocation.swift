@@ -18,7 +18,7 @@ public struct SourceLocation {
     public var range: Range<UInt>?
     
     /// Creates a new `SourceLocation`
-    public init(file: String, function: String, line: UInt, column: UInt, range: Range<UInt>?) {
+    init(file: String, function: String, line: UInt, column: UInt, range: Range<UInt>?) {
         self.file = file
         self.function = function
         self.line = line
@@ -29,7 +29,7 @@ public struct SourceLocation {
 
 extension SourceLocation {
     /// Creates a new `SourceLocation` for the current call site.
-    public static func capture(
+    static func capture(
         file: String = #file,
         function: String = #function,
         line: UInt = #line,

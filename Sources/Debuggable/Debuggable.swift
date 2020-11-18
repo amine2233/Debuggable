@@ -117,7 +117,7 @@ extension Debuggable {
 
     /// See `Debuggable`
     public var stackTrace: [String]? {
-        return nil
+        return Self.makeStackTrace()
     }
 }
 

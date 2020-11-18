@@ -1,22 +1,28 @@
 #if canImport(Foundation)
 import Foundation
 
-open class LoggerService: LoggerServiceProtocol {
-    
+open class LoggerService: LoggerServiceProtocol, Equatable {
+
     // The list of services added to this class as observers.
     internal private(set) var services = [LoggerServiceProtocol]()
     
     open var name: String
     
     open var isEnabled: Bool
+
+    open var minLoggerLevel: LoggerLevel
     
     open var bundleIdentifier: String? {
         return Bundle.main.bundleIdentifier
     }
+
+    public let queue: LoggerQueue
     
-    public init(name: String, enable: Bool = false) {
+    public init(name: String, enable: Bool = false, minLoggerLevel: LoggerLevel, queue: LoggerQueue) {
         self.name = name
         self.isEnabled = enable
+        self.minLoggerLevel = minLoggerLevel
+        self.queue = queue
     }
     
     /**
@@ -34,84 +40,88 @@ open class LoggerService: LoggerServiceProtocol {
     }
     
     public func enable(_ value: Bool, name: String) {
-        if let service = self.services.filter({ $0.name == name }).last {
+        if var service = self.services.filter({ $0.name == name }).last {
             service.isEnabled = value
         }
     }
     
-    public func log(_ message: @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        for service in services where service.isEnabled {
-            service.log(message(), level: level, file: file, line: line, column: column, function: function)
-        }
+    public func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel) {
+        dispatchLogger(message(), level: level)
     }
     
-    public func log(_ message: @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation) {
-        for service in services where service.isEnabled && service.shouldLog(context: context) {
-            service.log(message(), level: level, context: context, sourceLocation: sourceLocation)
+    public func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol) {
+        dispatchLogger(message(), level: level, context: context)
+    }
+
+    private func dispatchLogger(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
+        guard isAllowedToLog(level: level) else { return }
+        for service in services where service.isEnabled {
+            guard service.isAllowedToLog(level: level) else { continue }
+            queue.async {
+                service.log(message(), level: level, file: file, line: line, column: column, function: function)
+            }
         }
     }
-    
-    public func debug(_ message: @autoclosure () -> String, level: LoggerLevel) {
+
+    private func dispatchLogger(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
+        guard isAllowedToLog(level: level) else { return }
         for service in services where service.isEnabled {
-            service.debug(message(), level: level)
-        }
-    }
-    
-    public func debug(_ error: Debuggable) {
-        for service in services where service.isEnabled {
-            service.debug(error)
+            guard service.isAllowedToLog(level: level) else { continue }
+            queue.async {
+                service.log(message(), level: level, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
+            }
         }
     }
 }
 
 extension LoggerService {
     
-    public func log(error: @autoclosure () -> String, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(error(), level: .error, file: file, line: line, column: column, function: function)
+    public func log(error: @escaping @autoclosure () -> String) {
+        log(error(), level: .error)
     }
     
-    public func log(info: @autoclosure () -> String, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(info(), level: .info, file: file, line: line, column: column, function: function)
+    public func log(info: @escaping @autoclosure () -> String) {
+        log(info(), level: .info)
     }
     
-    public func log(debug: @autoclosure () -> String, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(debug(), level: .debug, file: file, line: line, column: column, function: function)
+    public func log(debug: @escaping @autoclosure () -> String) {
+        log(debug(), level: .debug)
     }
     
-    public func log(verbose: @autoclosure () -> String, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(verbose(), level: .verbose, file: file, line: line, column: column, function: function)
+    public func log(verbose: @escaping @autoclosure () -> String) {
+        log(verbose(), level: .verbose)
     }
     
-    public func log(warning: @autoclosure () -> String, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(warning(), level: .warning, file: file, line: line, column: column, function: function)
+    public func log(warning: @escaping @autoclosure () -> String) {
+        log(warning(), level: .warning)
     }
     
-    public func log(service: @autoclosure () -> String, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(service(), level: .service, file: file, line: line, column: column, function: function)
+    public func log(fatalError: @escaping @autoclosure () -> String) {
+        log(fatalError(), level: .fatalError)
     }
     
-    public func log(error: @autoclosure () -> String, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(error(), level: .error, file: file, line: line, column: column, function: function)
+    public func log(error: @escaping @autoclosure () -> String, context: ContextProtocol) {
+        log(error(), level: .error, context: context)
     }
     
-    public func log(info: @autoclosure () -> String, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(info(), level: .info, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
+    public func log(info: @escaping @autoclosure () -> String, context: ContextProtocol) {
+        log(info(), level: .info, context: context)
     }
     
-    public func log(debug: @autoclosure () -> String, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(debug(), level: .debug, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
+    public func log(debug: @escaping @autoclosure () -> String, context: ContextProtocol) {
+        log(debug(), level: .debug, context: context)
     }
     
-    public func log(verbose: @autoclosure () -> String, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(verbose(), level: .verbose, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
+    public func log(verbose: @escaping @autoclosure () -> String, context: ContextProtocol) {
+        log(verbose(), level: .verbose, context: context)
     }
     
-    public func log(warning: @autoclosure () -> String, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(warning(), level: .warning, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
+    public func log(warning: @escaping @autoclosure () -> String, context: ContextProtocol) {
+        log(warning(), level: .warning, context: context)
     }
     
-    public func log(service: @autoclosure () -> String, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        log(service(), level: .service, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
+    public func log(fatalError: @escaping @autoclosure () -> String, context: ContextProtocol) {
+        log(fatalError(), level: .fatalError, context: context)
     }
 }
 
