@@ -52,18 +52,11 @@ open class LoggerService: LoggerServiceProtocol, Equatable {
     public func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol) {
         dispatchLogger(message(), level: level, context: context)
     }
-    
-    public func debug(_ message: @escaping @autoclosure () -> String, level: LoggerLevel) {
-        dispatchLogger(message(), level: level)
-    }
-    
-    public func debug(_ error: Debuggable) {
-        dispatchDebug(error)
-    }
 
     private func dispatchLogger(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
+        guard isAllowedToLog(level: level) else { return }
         for service in services where service.isEnabled {
-            guard service.isAllowedToLog(level: level, service: service) else { continue }
+            guard service.isAllowedToLog(level: level) else { continue }
             queue.async {
                 service.log(message(), level: level, file: file, line: line, column: column, function: function)
             }
@@ -71,18 +64,11 @@ open class LoggerService: LoggerServiceProtocol, Equatable {
     }
 
     private func dispatchLogger(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
+        guard isAllowedToLog(level: level) else { return }
         for service in services where service.isEnabled {
-            guard service.isAllowedToLog(level: level, service: service) else { continue }
+            guard service.isAllowedToLog(level: level) else { continue }
             queue.async {
                 service.log(message(), level: level, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
-            }
-        }
-    }
-
-    private func dispatchDebug(_ error: Debuggable) {
-        for service in services where service.isEnabled {
-            queue.async {
-                service.debug(error)
             }
         }
     }

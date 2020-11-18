@@ -98,16 +98,6 @@ public protocol LoggerServiceProtocol {
      Log function with context
      */
     func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol)
-    
-    /**
-     Simple debug info
-     */
-    func debug(_ message: @escaping @autoclosure () -> String, level: LoggerLevel)
-    
-    /**
-     Debug information for debuggable protocol
-     */
-    func debug(_ error: Debuggable)
 }
 
 extension LoggerServiceProtocol {
@@ -115,9 +105,9 @@ extension LoggerServiceProtocol {
         return logContexts.contains(where: { $0.name == context.name} )
     }
 
-    public func isAllowedToLog(level: LoggerLevel, service: LoggerServiceProtocol) -> Bool {
-        guard service.minLoggerLevel != .didabled else { return false }
-        return level.rawValue <= service.minLoggerLevel.rawValue
+    public func isAllowedToLog(level: LoggerLevel) -> Bool {
+        guard minLoggerLevel != .didabled else { return false }
+        return level.rawValue <= minLoggerLevel.rawValue
     }
 }
 

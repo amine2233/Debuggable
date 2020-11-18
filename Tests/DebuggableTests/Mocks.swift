@@ -20,6 +20,7 @@ final class LoggerQueueMock: LoggerQueue {
 }
 
 final class LoggerServiceMock: LoggerServiceProtocol {
+
     var invokedMinLoggerLevelGetter = false
     var invokedMinLoggerLevelGetterCount = 0
     var stubbedMinLoggerLevel: LoggerLevel!
