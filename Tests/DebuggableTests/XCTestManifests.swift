@@ -1,6 +1,6 @@
+#if !canImport(ObjectiveC)
 import XCTest
 
-#if !os(macOS)
 public func allTests() -> [XCTestCaseEntry] {
     return [
         testCase(DebuggableTests.allTests),
