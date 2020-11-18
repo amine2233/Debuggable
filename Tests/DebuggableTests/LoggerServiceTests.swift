@@ -50,7 +50,7 @@ final class LoggerServiceTests: XCTestCase {
         let underTest = makeTest(name: #function)
 
         // THEN
-        XCTAssertEqual(underTest.bundleIdentifier, "com.apple.dt.xctest.tool")
+        XCTAssertEqual(underTest.bundleIdentifier, Bundle(identifier: "com.apple.dt.xctest.tool")?.bundleIdentifier)
     }
 
     func testRemoveServce() {

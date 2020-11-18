@@ -132,27 +132,35 @@ extension LoggerServiceProtocol {
     }
     
     public func log(_ message: @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        var debug = "[\(name)]"
+        var debug = ""
+        #if os(Linux)
+        debug += "\(level.color) "
+        #endif
+        debug += "[\(name)]"
         if let bundleIdentifier = self.bundleIdentifier {
             debug += "[\(bundleIdentifier)]"
         }
-        debug += "[\(Date().toLoggerString)] \(level.description) [\(file.sourcefile)] : [\(line):\(column):\(function)]\n\(message())"
+        debug += "\(level.color) [\(Date().toLoggerString)] \(level.description) [\(file.sourcefile)]:  [\(line):\(column):\(function)]\n\(message())"
         
-        debugPrint(debug)
+        print(debug)
     }
     
     public func log(_ message: @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation) {
-        var debug = "[\(name)]"
+        var debug = ""
+        #if os(Linux)
+        debug += "\(level.color) "
+        #endif
+        debug += "[\(name)]"
         if let bundleIdentifier = self.bundleIdentifier {
             debug += "[\(bundleIdentifier)]"
         }
-        debug += "[\(Date().toLoggerString)] \(level.description) [\(sourceLocation.file.sourcefile)] : [\(context.name)]: [\(sourceLocation.line):\(sourceLocation.column):\(sourceLocation.function)]\n\(message())"
+        debug += "[\(Date().toLoggerString)] \(level.description) [\(sourceLocation.file.sourcefile)]: [\(context.name)]: [\(sourceLocation.line):\(sourceLocation.column):\(sourceLocation.function)]\n\(message())"
         
-        debugPrint(debug)
+        print(debug)
     }
 
     public func debug(_ error: Debuggable) {
-        debugPrint(error.debugDescription)
+        print(error.debugDescription)
     }
 }
 #endif
