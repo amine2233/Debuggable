@@ -29,13 +29,14 @@ final class LoggerServiceTests: XCTestCase {
         LoggerService(name: name,
                       enable: enable,
                       minLoggerLevel: minLoggerLevel,
-                      queue: loggerQueue)
+                      queue: loggerQueue,
+                      bundle: .test)
     }
 
     func testAddServce() {
         // GIVEN
         service.stubbedName = "oslog"
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
 
         // WHEN
         underTest.add(service: service)
@@ -50,13 +51,14 @@ final class LoggerServiceTests: XCTestCase {
         let underTest = makeTest(name: #function)
 
         // THEN
-        XCTAssertEqual(underTest.bundleIdentifier, Bundle(identifier: "com.apple.dt.xctest.tool")?.bundleIdentifier)
+        // Bundle(identifier: "com.apple.dt.xctest.tool")?.bundleIdentifier
+        XCTAssertEqual(underTest.bundleIdentifier, "DebuggableTests")
     }
 
     func testRemoveServce() {
         // GIVEN
         service.stubbedName = "oslog"
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -70,7 +72,7 @@ final class LoggerServiceTests: XCTestCase {
     func testEnableServce() {
         // GIVEN
         service.stubbedName = "oslog"
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -86,7 +88,7 @@ final class LoggerServiceTests: XCTestCase {
         // GIVEN
         service.stubbedName = "oslog"
         service.isEnabled = false
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -104,7 +106,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .fatalError
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -120,7 +122,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .debug
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -136,7 +138,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .info
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -152,7 +154,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .warning
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -168,7 +170,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .warning
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function, minLoggerLevel: .debug)
+        var underTest = makeTest(name: #function, minLoggerLevel: .debug)
         underTest.add(service: service)
 
         // WHEN
@@ -184,7 +186,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .fatalError
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -200,7 +202,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .debug
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -216,7 +218,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .info
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -232,7 +234,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .warning
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -248,7 +250,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .warning
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function, minLoggerLevel: .debug)
+        var underTest = makeTest(name: #function, minLoggerLevel: .debug)
         underTest.add(service: service)
 
         // WHEN
@@ -264,7 +266,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .error
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -280,7 +282,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .info
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -296,7 +298,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .debug
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -312,7 +314,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .verbose
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function, minLoggerLevel: .verbose)
+        var underTest = makeTest(name: #function, minLoggerLevel: .verbose)
         underTest.add(service: service)
 
         // WHEN
@@ -328,7 +330,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .warning
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -344,7 +346,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .fatalError
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -360,7 +362,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .error
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -376,7 +378,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .info
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -392,7 +394,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .debug
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -408,7 +410,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .verbose
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function, minLoggerLevel: .verbose)
+        var underTest = makeTest(name: #function, minLoggerLevel: .verbose)
         underTest.add(service: service)
 
         // WHEN
@@ -424,7 +426,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .warning
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN
@@ -440,7 +442,7 @@ final class LoggerServiceTests: XCTestCase {
         service.stubbedIsEnabled = true
         service.stubbedMinLoggerLevel = .fatalError
         loggerQueue.shouldInvokeAsyncWork = true
-        let underTest = makeTest(name: #function)
+        var underTest = makeTest(name: #function)
         underTest.add(service: service)
 
         // WHEN

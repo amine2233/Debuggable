@@ -1,41 +1,44 @@
 #if canImport(Foundation)
 import Foundation
 
-open class LoggerService: LoggerServiceProtocol, Equatable {
+public struct LoggerService: LoggerServiceProtocol, Equatable {
 
     // The list of services added to this class as observers.
     internal private(set) var services = [LoggerServiceProtocol]()
     
-    open var name: String
+    public let name: String
     
-    open var isEnabled: Bool
+    public var isEnabled: Bool
 
-    open var minLoggerLevel: LoggerLevel
+    public var minLoggerLevel: LoggerLevel
     
-    open var bundleIdentifier: String? {
-        return Bundle.main.bundleIdentifier
-    }
+    public let bundleIdentifier: String?
 
     public let queue: LoggerQueue
     
-    public init(name: String, enable: Bool = false, minLoggerLevel: LoggerLevel, queue: LoggerQueue) {
+    public init(name: String,
+                enable: Bool = false,
+                minLoggerLevel: LoggerLevel = .didabled,
+                queue: LoggerQueue = DispatchQueue.global(),
+                bundle: Bundle = .main) {
         self.name = name
         self.isEnabled = enable
         self.minLoggerLevel = minLoggerLevel
         self.queue = queue
+        self.bundleIdentifier = bundle.bundleIdentifier
     }
     
     /**
      Adds a service as an observer.
      */
-    public func add(service: LoggerServiceProtocol) {
+    public mutating func add(service: LoggerServiceProtocol) {
         self.services.append(service)
     }
     
     /**
      Removes a service in observer
      */
-    public func remove(service: LoggerServiceProtocol) {
+    public mutating func remove(service: LoggerServiceProtocol) {
         self.services = self.services.filter { $0.name != service.name }
     }
     

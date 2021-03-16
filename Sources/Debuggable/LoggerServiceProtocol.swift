@@ -140,7 +140,7 @@ extension LoggerServiceProtocol {
         if let bundleIdentifier = self.bundleIdentifier {
             debug += "[\(bundleIdentifier)]"
         }
-        debug += "\(level.color) [\(Date().toLoggerString)] \(level.description) [\(file.sourcefile)]:  [\(line):\(column):\(function)]\n\(message())"
+        debug += "[\(Date().toLoggerString)] \(level.description) [\(file.sourcefile)]:  [\(line):\(column):\(function)]\n\(message())"
         
         print(debug)
     }
