@@ -100,6 +100,36 @@ final class LoggerServiceTests: XCTestCase {
         XCTAssertEqual(service.invokedIsEnabledSetterCount, 2)
     }
 
+    func testEnableContext() {
+        // GIVEN
+        service.stubbedName = "oslog"
+        var underTest = makeTest(name: #function)
+        underTest.add(service: service)
+        underTest.add(context: contextMock)
+
+        // WHEN
+        let result = underTest.shouldLog(context: contextMock)
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testDisableContext() {
+        // GIVEN
+        service.stubbedName = "oslog"
+        service.isEnabled = false
+        var underTest = makeTest(name: #function)
+        underTest.add(service: service)
+        underTest.add(context: contextMock)
+
+        // WHEN
+        underTest.remove(context: contextMock)
+        let result = underTest.shouldLog(context: contextMock)
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
     func testLogMessageWhenMinLoggerLevelIsEqualPriorityThenServiceLogget() {
         // GIVEN
         service.stubbedName = "oslog"
@@ -188,6 +218,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log("test", level: .debug, context: contextMock)
@@ -204,6 +235,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log("test", level: .debug, context: contextMock)
@@ -220,6 +252,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log("test", level: .debug, context: contextMock)
@@ -364,12 +397,29 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log(error: "test", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
+    }
+
+    func testLogErrorWhenLogContextDoesnotContainTheContext() {
+        // GIVEN
+        service.stubbedName = "oslog"
+        service.stubbedIsEnabled = true
+        service.stubbedMinLoggerLevel = .error
+        loggerQueue.shouldInvokeAsyncWork = true
+        var underTest = makeTest(name: #function)
+        underTest.add(service: service)
+
+        // WHEN
+        underTest.log(error: "test", context: contextMock)
+
+        // THEN
+        XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 0)
     }
 
     func testLogInfoContext() {
@@ -380,6 +430,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log(info: "test", context: contextMock)
@@ -396,6 +447,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log(debug: "test", context: contextMock)
@@ -412,6 +464,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function, minLoggerLevel: .verbose)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log(verbose: "test", context: contextMock)
@@ -428,6 +481,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log(warning: "test", context: contextMock)
@@ -444,6 +498,7 @@ final class LoggerServiceTests: XCTestCase {
         loggerQueue.shouldInvokeAsyncWork = true
         var underTest = makeTest(name: #function)
         underTest.add(service: service)
+        underTest.add(context: contextMock)
 
         // WHEN
         underTest.log(fatalError: "test", context: contextMock)

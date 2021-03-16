@@ -5,7 +5,10 @@ public struct LoggerService: LoggerServiceProtocol, Equatable {
 
     // The list of services added to this class as observers.
     internal private(set) var services = [LoggerServiceProtocol]()
-    
+
+    // The list of context enabled
+    public private(set) var logContexts = [ContextProtocol]()
+
     public let name: String
     
     public var isEnabled: Bool
@@ -15,7 +18,7 @@ public struct LoggerService: LoggerServiceProtocol, Equatable {
     public let bundleIdentifier: String?
 
     public let queue: LoggerQueue
-    
+
     public init(name: String,
                 enable: Bool = false,
                 minLoggerLevel: LoggerLevel = .didabled,
@@ -47,7 +50,21 @@ public struct LoggerService: LoggerServiceProtocol, Equatable {
             service.isEnabled = value
         }
     }
-    
+
+    /**
+     Adds a context as an observer.
+     */
+    public mutating func add(context: ContextProtocol) {
+        self.logContexts.append(context)
+    }
+
+    /**
+     Removes a context in observer
+     */
+    public mutating func remove(context: ContextProtocol) {
+        self.logContexts = self.logContexts.filter { $0.name != context.name }
+    }
+
     public func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel) {
         dispatchLogger(message(), level: level)
     }
@@ -68,6 +85,7 @@ public struct LoggerService: LoggerServiceProtocol, Equatable {
 
     private func dispatchLogger(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
         guard isAllowedToLog(level: level) else { return }
+        guard shouldLog(context: context) else { return }
         for service in services where service.isEnabled {
             guard service.isAllowedToLog(level: level) else { continue }
             queue.async {
