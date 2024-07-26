@@ -1,13 +1,11 @@
 import Foundation
 
-public protocol LoggerQueue {
-    func async(group: DispatchGroup?, qos: DispatchQoS, flags: DispatchWorkItemFlags, execute work: @escaping @convention(block) () -> Void)
+public protocol LoggerQueue: Sendable {
+    func async(group: DispatchGroup?, qos: DispatchQoS, flags: DispatchWorkItemFlags, execute work: @escaping @Sendable @convention(block) () -> Void)
 }
 
-public extension LoggerQueue {
-    func async(execute work: @escaping () -> Void) {
+extension DispatchQueue: LoggerQueue {
+    func async(execute work: @escaping @Sendable @convention(block) () -> Void) {
         async(group: nil, qos: .unspecified, flags: [], execute: work)
     }
 }
-
-extension DispatchQueue: LoggerQueue {}
