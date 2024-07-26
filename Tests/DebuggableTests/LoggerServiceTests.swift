@@ -8,14 +8,37 @@
 import XCTest
 @testable import Debuggable
 
+extension LoggerColorConfiguration {
+    static let macOS: LoggerColorConfiguration = LoggerColorConfiguration(
+        disable: { $0 },
+        debug: { Array($0).map({ "\($0)\u{fe07}" }).joined() }, // green
+        info: { Array($0).map({ "\($0)\u{fe09}" }).joined() }, // blue
+        warning: { Array($0).map({ "\($0)\u{fe08}" }).joined() }, // orange
+        error: { Array($0).map({ "\($0)\u{fe06}" }).joined() }, // red
+        fatalError: { Array($0).map({ "\($0)\u{fe06}" }).joined() }, // red
+        verbose: { Array($0).map({ "\($0)\u{fe0A}" }).joined() }, // pink
+        description: "macOS"
+    )
+}
+
 final class LoggerServiceTests: XCTestCase {
     var loggerQueue: LoggerQueueMock!
     var service: LoggerServiceMock!
     var contextMock: ContextMock!
 
     override func setUpWithError() throws {
+        var color: LoggerColorConfiguration = .macOS
+        #if os(Linux)
+        color = .linux
+        #endif
+
         loggerQueue = LoggerQueueMock()
         service = LoggerServiceMock()
+        service.stubbedLoggerColorConfigurationLevel = color
+        service.stubbedLoggerDescriptionConfigurationLevel = .default
+        #if os(Linux)
+        service.loggerColorConfiguration = .linux
+        #endif
         contextMock = ContextMock()
     }
 
@@ -29,14 +52,13 @@ final class LoggerServiceTests: XCTestCase {
         name: String,
         enable: Bool = true,
         minLoggerLevel: LoggerLevel = .fatalError
-    ) -> LoggerServiceDefault {
-        LoggerServiceDefault(
+    ) -> any LoggerService {
+        return LoggerServiceFactory.build(
             name: name,
             enable: enable,
             minLoggerLevel: minLoggerLevel,
             queue: loggerQueue,
-            bundleIdentifier: Bundle.test.bundleIdentifier,
-            loggerColorConfiguration: .macos
+            bundleIdentifier: Bundle.test.bundleIdentifier
         )
     }
 
@@ -117,7 +139,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .debug)
+        underTest.log("test debug", level: .debug)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -133,7 +155,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .debug)
+        underTest.log("test debug", level: .debug)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -149,7 +171,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .debug)
+        underTest.log("test debug", level: .debug)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -165,7 +187,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .error)
+        underTest.log("test error", level: .error)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 0)
@@ -181,7 +203,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .error)
+        underTest.log("test error", level: .error)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 0)
@@ -197,7 +219,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .debug, context: contextMock)
+        underTest.log("test debug", level: .debug, context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -213,7 +235,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .debug, context: contextMock)
+        underTest.log("test debug", level: .debug, context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -229,7 +251,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .debug, context: contextMock)
+        underTest.log("test debug", level: .debug, context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -245,7 +267,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .error, context: contextMock)
+        underTest.log("test error", level: .error, context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 0)
@@ -261,7 +283,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log("test", level: .error, context: contextMock)
+        underTest.log("test error", level: .error, context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 0)
@@ -277,7 +299,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(error: "test")
+        underTest.log(error: "test error")
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -293,7 +315,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(info: "test")
+        underTest.log(info: "test info")
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -309,7 +331,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(debug: "test")
+        underTest.log(debug: "test debug")
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -325,7 +347,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(verbose: "test")
+        underTest.log(verbose: "test verbose")
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -341,7 +363,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(warning: "test")
+        underTest.log(warning: "test warning")
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -357,7 +379,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(fatalError: "test")
+        underTest.log(fatalError: "test fatalError")
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -373,7 +395,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(error: "test", context: contextMock)
+        underTest.log(error: "test error", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -389,7 +411,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(info: "test", context: contextMock)
+        underTest.log(info: "test info", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -405,7 +427,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(debug: "test", context: contextMock)
+        underTest.log(debug: "test debug", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -421,7 +443,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(verbose: "test", context: contextMock)
+        underTest.log(verbose: "test verbose", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -437,7 +459,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(warning: "test", context: contextMock)
+        underTest.log(warning: "test warning", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)
@@ -453,7 +475,7 @@ final class LoggerServiceTests: XCTestCase {
         underTest.add(service: service)
 
         // WHEN
-        underTest.log(fatalError: "test", context: contextMock)
+        underTest.log(fatalError: "test fatalError", context: contextMock)
 
         // THEN
         XCTAssertEqual(self.loggerQueue.invokedAsyncCount, 1)

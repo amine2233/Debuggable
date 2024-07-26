@@ -39,11 +39,18 @@ public protocol LoggerQueue: Sendable {
     ///
     /// - Note:
     ///   Ensure that the block is thread-safe, especially if it modifies shared resources. Use appropriate synchronization mechanisms to avoid race conditions.
-    func async(group: DispatchGroup?, qos: DispatchQoS, flags: DispatchWorkItemFlags, execute work: @escaping @Sendable @convention(block) () -> Void)
+    func async(
+        group: DispatchGroup?,
+        qos: DispatchQoS,
+        flags: DispatchWorkItemFlags,
+        execute work: @escaping @Sendable @convention(block) () -> Void
+    )
 }
 
-extension DispatchQueue: LoggerQueue {
-    func async(execute work: @escaping @Sendable @convention(block) () -> Void) {
+extension DispatchQueue: LoggerQueue, @unchecked Sendable {
+    func async(
+        execute work: @escaping @Sendable @convention(block) () -> Void
+    ) {
         async(group: nil, qos: .unspecified, flags: [], execute: work)
     }
 }
