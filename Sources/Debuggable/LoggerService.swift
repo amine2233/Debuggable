@@ -1,150 +1,205 @@
 import Foundation
 
-public struct LoggerService: LoggerServiceProtocol, Equatable {
-
-    // The list of services added to this class as observers.
-    private(set) var services = [any LoggerServiceProtocol]()
+public struct LoggerColorConfiguration: Sendable {
+    public let configuration: [LoggerLevel: String]
     
-    public let name: String
-    
-    public var isEnabled: Bool
-
-    public var minLoggerLevel: LoggerLevel
-    
-    public let bundleIdentifier: String?
-
-    public let queue: any LoggerQueue
-    
-    public init(name: String,
-                enable: Bool = false,
-                minLoggerLevel: LoggerLevel = .didabled,
-                queue: any LoggerQueue = DispatchQueue.global(),
-                bundleIdentifier: String? = Bundle.main.bundleIdentifier) {
-        self.name = name
-        self.isEnabled = enable
-        self.minLoggerLevel = minLoggerLevel
-        self.queue = queue
-        self.bundleIdentifier = bundleIdentifier
+    public init(configuration: [LoggerLevel : String]) {
+        self.configuration = configuration
     }
+}
+
+public extension LoggerColorConfiguration {
+    static let `default`: LoggerColorConfiguration = LoggerColorConfiguration(
+        configuration: [
+            .didabled: "\u{001B}[0;30m",
+            .debug: "\u{001B}[0;33m",
+            .info: "\u{001B}[0;34m",
+            .warning: "\u{001B}[0;33m",
+            .error: "\u{001B}[0;31m",
+            .fatalError: "\u{001B}[0;35m",
+            .verbose: "\u{001B}[0;32m"
+        ]
+    )
+
+    static let macos: LoggerColorConfiguration = LoggerColorConfiguration(
+        configuration: [
+            .didabled: "\u{fe07}",
+            .debug: "\u{fe07}",
+            .info: "\u{fe07}",
+            .warning: "\u{fe08}",
+            .error: "\u{fe06}",
+            .fatalError: "\u{fe06}",
+            .verbose: "\u{fe07}"
+        ]
+    )
+}
+
+/// Log level
+public enum LoggerLevel: Int, CaseIterable, Equatable, Sendable {
+    case didabled
+    case debug
+    case info
+    case warning
+    case error
+    case fatalError
+    case verbose
+
+    public func color(loggerColorConfiguration: LoggerColorConfiguration) -> String {
+        loggerColorConfiguration.configuration[self] ?? ""
+    }
+}
+
+extension LoggerLevel: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .didabled: return "⛔️"
+        case .error: return "‼️" // error
+        case .info: return "ℹ️" // info
+        case .debug: return "💬" // debug
+        case .verbose: return "🔬" // verbose
+        case .warning: return "⚠️" // warning
+        case .fatalError: return "🔥" // service
+        }
+    }
+}
+
+/// Context for debugging
+public protocol ContextProtocol: Sendable {
+    var name: String { get }    
+}
+
+extension ContextProtocol where Self: Equatable {
+    
+    /// Returns a Boolean value indicating whether two values are equal.
+    ///
+    /// Equality is the inverse of inequality. For any values `a` and `b`,
+    /// `a == b` implies that `a != b` is `false`.
+    ///
+    /// - Parameters:
+    ///   - lhs: A value to compare.
+    ///   - rhs: Another value to compare.
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.name == rhs.name
+    }
+}
+
+/// The logger service protocol
+public protocol LoggerService: Sendable {
+    /// Minimum loggger level by default is error
+    var minLoggerLevel: LoggerLevel { get }
+    /**
+     The name of logger
+     */
+    var name: String { get }
     
     /**
-     Adds a service as an observer.
+     The bundle identifier
      */
-    public mutating func add(service: any LoggerServiceProtocol) {
-        self.services.append(service)
-    }
+    var bundleIdentifier: String? { get }
     
     /**
-     Removes a service in observer
+     This will enable or disable the service
      */
-    public mutating func remove(service: any LoggerServiceProtocol) {
-        self.services = self.services.filter { $0.name != service.name }
-    }
+    var isEnabled: Bool { get set }
     
-    public func enable(_ value: Bool, name: String) {
-        if var service = self.services.filter({ $0.name == name }).last {
-            service.isEnabled = value
-        }
-    }
+    /**
+     The context of logging
+     */
+    var logContexts: [any ContextProtocol] { get }
     
-    public func log(_ message: @escaping @Sendable @autoclosure () -> String, level: LoggerLevel) {
-        dispatchLogger(message(), level: level)
-    }
+    /// Logger color configuration
+    var loggerColorConfiguration: LoggerColorConfiguration { get }
     
-    public func log(_ message: @escaping @Sendable @autoclosure () -> String, level: LoggerLevel, context: any ContextProtocol) {
-        dispatchLogger(message(), level: level, context: context)
+    /**
+     Log function
+     */
+    func log(_ message: @escaping @Sendable @autoclosure () -> String, level: LoggerLevel)
+    
+    /**
+     Log function with context
+     */
+    func log(
+        _ message: @escaping @Sendable @autoclosure () -> String,
+        level: LoggerLevel,
+        context: any ContextProtocol
+    )
+}
+
+extension LoggerService {
+    func shouldLog(context: any ContextProtocol) -> Bool {
+        return logContexts.contains(where: { $0.name == context.name} )
     }
 
-    private func dispatchLogger(_ message: @escaping @Sendable @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        guard isAllowedToLog(level: level) else { return }
-        for service in services where service.isEnabled {
-            guard service.isAllowedToLog(level: level) else { continue }
-            queue.async(group: .none, qos: .default, flags: .detached) {
-                service.log(message(), level: level, file: file, line: line, column: column, function: function)
-            }
-        }
+    public func isAllowedToLog(level: LoggerLevel) -> Bool {
+        guard minLoggerLevel != .didabled else { return false }
+        return level.rawValue <= minLoggerLevel.rawValue
     }
+}
 
-    private func dispatchLogger(_ message: @escaping @Sendable @autoclosure () -> String, level: LoggerLevel, context: any ContextProtocol, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
-        guard isAllowedToLog(level: level) else { return }
-        for service in services where service.isEnabled {
-            guard service.isAllowedToLog(level: level) else { continue }
-            queue.async(group: .none, qos: .default, flags: .detached) {
-                service.log(message(), level: level, context: context, sourceLocation: SourceLocation(file: file, function: function, line: line, column: column, range: nil))
-            }
-        }
+extension LoggerService where Self: Equatable {
+    /// Returns a Boolean value indicating whether two values are equal.
+    ///
+    /// Equality is the inverse of inequality. For any values `a` and `b`,
+    /// `a == b` implies that `a != b` is `false`.
+    ///
+    /// - Parameters:
+    ///   - lhs: A value to compare.
+    ///   - rhs: Another value to compare.
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.name == rhs.name
     }
 }
 
 extension LoggerService {
     
-    public func log(error: @escaping @Sendable @autoclosure () -> String) {
-        log(error(), level: .error)
+    public var logContexts: [any ContextProtocol] {
+        return []
     }
     
-    public func log(info: @escaping @Sendable @autoclosure () -> String) {
-        log(info(), level: .info)
+    public func log(
+        _ message: @autoclosure () -> String,
+        level: LoggerLevel,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column,
+        function: String = #function
+    ) {
+        var debug = ""
+        debug += "[\(name)]"
+        if let bundleIdentifier = self.bundleIdentifier {
+            debug += "[\(bundleIdentifier)]"
+        }
+        debug += "[\(Date().toLoggerString)] \(level.description) [\(file.sourcefile)]:  [\(line):\(column):\(function)]\n\(message())"
+        
+        print(debug.color(level.color(loggerColorConfiguration: loggerColorConfiguration)))
     }
     
-    public func log(debug: @escaping @Sendable @autoclosure () -> String) {
-        log(debug(), level: .debug)
+    public func log(
+        _ message: @autoclosure () -> String,
+        level: LoggerLevel,
+        context: any ContextProtocol,
+        sourceLocation: SourceLocation
+    ) {
+        var debug = ""
+        debug += debug.color(level.color(loggerColorConfiguration: loggerColorConfiguration))
+        debug += "[\(name)]"
+        if let bundleIdentifier = self.bundleIdentifier {
+            debug += "[\(bundleIdentifier)]"
+        }
+        debug += "[\(Date().toLoggerString)] \(level.description) [\(sourceLocation.file.sourcefile)]: [\(context.name)]: [\(sourceLocation.line):\(sourceLocation.column):\(sourceLocation.function)]\n\(message())"
+        
+        print(debug.color(level.color(loggerColorConfiguration: loggerColorConfiguration)))
     }
-    
-    public func log(verbose: @escaping @Sendable @autoclosure () -> String) {
-        log(verbose(), level: .verbose)
-    }
-    
-    public func log(warning: @escaping @Sendable @autoclosure () -> String) {
-        log(warning(), level: .warning)
-    }
-    
-    public func log(fatalError: @escaping @Sendable @autoclosure () -> String) {
-        log(fatalError(), level: .fatalError)
-    }
-    
-    public func log(error: @escaping @Sendable @autoclosure () -> String, context: any ContextProtocol) {
-        log(error(), level: .error, context: context)
-    }
-    
-    public func log(info: @escaping @Sendable @autoclosure () -> String, context: any ContextProtocol) {
-        log(info(), level: .info, context: context)
-    }
-    
-    public func log(debug: @escaping @Sendable @autoclosure () -> String, context: any ContextProtocol) {
-        log(debug(), level: .debug, context: context)
-    }
-    
-    public func log(verbose: @escaping @Sendable @autoclosure () -> String, context: any ContextProtocol) {
-        log(verbose(), level: .verbose, context: context)
-    }
-    
-    public func log(warning: @escaping @Sendable @autoclosure () -> String, context: any ContextProtocol) {
-        log(warning(), level: .warning, context: context)
-    }
-    
-    public func log(fatalError: @escaping @Sendable @autoclosure () -> String, context: any ContextProtocol) {
-        log(fatalError(), level: .fatalError, context: context)
-    }
-}
 
-extension Date {
-    static let dateFormat = "yyyy-MM-dd hh:mm:ssSSS"
-
-    static let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = dateFormat
-        formatter.locale = Locale.current
-        return formatter
-    }()
-
-    var toLoggerString: String {
-        return Date.dateFormatter.string(from: self as Date)
+    public func debug(_ error: any Debuggable) {
+        print(error.debugDescription)
     }
 }
 
 extension String {
-    var sourcefile: String {
-        let components = self.components(separatedBy: "/")
-        return components.isEmpty ? "" : components.last ?? ""
+    
+    func color(_ color: String) -> String {
+        //return Array(self).map({ "\($0)\u{fe07}"}).joined()
+        return Array(self).map({ "\($0)\(String(color))" }).joined()
     }
 }

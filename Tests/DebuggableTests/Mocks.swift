@@ -19,7 +19,9 @@ final class LoggerQueueMock: LoggerQueue, @unchecked Sendable {
     }
 }
 
-final class LoggerServiceMock: LoggerServiceProtocol, @unchecked Sendable {
+final class LoggerServiceMock: LoggerService, @unchecked Sendable {
+    var loggerColorConfiguration: LoggerColorConfiguration = .default
+    
 
     var invokedMinLoggerLevelGetter = false
     var invokedMinLoggerLevelGetterCount = 0

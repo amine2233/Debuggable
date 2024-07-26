@@ -25,12 +25,19 @@ final class LoggerServiceTests: XCTestCase {
         contextMock = nil
     }
 
-    func makeTest(name: String, enable: Bool = true, minLoggerLevel: LoggerLevel = .fatalError) -> LoggerService {
-        LoggerService(name: name,
-                      enable: enable,
-                      minLoggerLevel: minLoggerLevel,
-                      queue: loggerQueue,
-                      bundleIdentifier: Bundle.test.bundleIdentifier)
+    func makeTest(
+        name: String,
+        enable: Bool = true,
+        minLoggerLevel: LoggerLevel = .fatalError
+    ) -> LoggerServiceDefault {
+        LoggerServiceDefault(
+            name: name,
+            enable: enable,
+            minLoggerLevel: minLoggerLevel,
+            queue: loggerQueue,
+            bundleIdentifier: Bundle.test.bundleIdentifier,
+            loggerColorConfiguration: .macos
+        )
     }
 
     func testAddServce() {
