@@ -8,17 +8,13 @@ on:
 
 jobs:
   test:
-    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
     strategy:
       matrix:
         os: [macOS-latest, ubuntu-latest]
-        swift: ["5.5", "5.7", "5.9"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: ${{ matrix.swift }}
-      - name: Build
-        run: swift build -v
-      - name: Run tests
-        run: swift test -v
+    - uses: actions/checkout@v4
+    - name: Build
+      run: swift build -v
+    - name: Run tests
+      run: swift test -v
