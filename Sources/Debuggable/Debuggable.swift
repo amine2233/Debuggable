@@ -1,9 +1,8 @@
-#if canImport(Foundation)
 import Foundation
 
 /// `Debuggable` provides an interface that allows a type
 /// to be more easily debugged in the case of an error.
-public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertible, LocalizedError {
+public protocol Debuggable: CustomDebugStringConvertible, CustomStringConvertible, LocalizedError, Sendable {
     /// A readable name for the error's Type. This is usually
     /// similar to the Type name of the error with spaces added.
     /// This will normally be printed proceeding the error's reason.
@@ -66,87 +65,88 @@ extension Debuggable {
     }
 }
 
-extension Debuggable {
-    public var fullIdentifier: String {
+public extension Debuggable {
+    var fullIdentifier: String {
         return Self.typeIdentifier + "." + identifier
     }
 }
 
 // MARK: Defaults
-extension Debuggable {
+
+public extension Debuggable {
     /// See `Debuggable`
-    public static var readableName: String {
+    static var readableName: String {
         return typeIdentifier
     }
 
     /// See `Debuggable`
-    public static var typeIdentifier: String {
+    static var typeIdentifier: String {
         let type = "\(self)"
         return type.split(separator: ".").last.flatMap(String.init) ?? type
     }
 
     /// See `Debuggable`
-    public var possibleCauses: [String] {
+    var possibleCauses: [String] {
         return []
     }
 
     /// See `Debuggable`
-    public var suggestedFixes: [String] {
+    var suggestedFixes: [String] {
         return []
     }
 
     /// See `Debuggable`
-    public var documentationLinks: [String] {
+    var documentationLinks: [String] {
         return []
     }
 
     /// See `Debuggable`
-    public var stackOverflowQuestions: [String] {
+    var stackOverflowQuestions: [String] {
         return []
     }
 
     /// See `Debuggable`
-    public var gitHubIssues: [String] {
+    var gitHubIssues: [String] {
         return []
     }
 
     /// See `Debuggable`
-    public var sourceLocation: SourceLocation? {
+    var sourceLocation: SourceLocation? {
         return nil
     }
 
     /// See `Debuggable`
-    public var stackTrace: [String]? {
+    var stackTrace: [String]? {
         return Self.makeStackTrace()
     }
 }
 
 /// MARK: Custom...StringConvertible
-extension Debuggable {
+public extension Debuggable {
     /// See `CustomDebugStringConvertible`
-    public var debugDescription: String {
+    var debugDescription: String {
         return debuggableHelp(format: .long)
     }
 
     /// See `CustomStringConvertible`
-    public var description: String {
+    var description: String {
         return debuggableHelp(format: .short)
     }
 }
 
 // MARK: Localized
-extension Debuggable {
+public extension Debuggable {
     /// A localized message describing what error occurred.
-    public var errorDescription: String? { return description }
+    var errorDescription: String? { return description }
 
     /// A localized message describing the reason for the failure.
-    public var failureReason: String? { return reason }
+    var failureReason: String? { return reason }
 
     /// A localized message describing how one might recover from the failure.
-    public var recoverySuggestion: String? { return suggestedFixes.first }
+    var recoverySuggestion: String? { return suggestedFixes.first }
 
     /// A localized message providing "help" text if the user requests help.
-    public var helpAnchor: String? { return documentationLinks.first }
+    var helpAnchor: String? { return documentationLinks.first }
 }
 
 
@@ -157,11 +157,11 @@ public enum HelpFormat {
     case long
 }
 
-extension Debuggable {
+public extension Debuggable {
     /// A computed property returning a `String` that encapsulates why the error occurred, suggestions on how to
     /// fix the problem, and resources to consult in debugging (if these are available).
     /// - note: This representation is best used with functions like print()
-    public func debuggableHelp(format: HelpFormat) -> String {
+    func debuggableHelp(format: HelpFormat) -> String {
         var print: [String] = []
 
         switch format {
@@ -238,4 +238,3 @@ extension Sequence where Iterator.Element == String {
         return map { "\n- \($0)" } .joined()
     }
 }
-#endif

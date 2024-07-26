@@ -1,8 +1,7 @@
-#if canImport(Foundation)
 import Foundation
 
 /// Log level
-public enum LoggerLevel: Int, CaseIterable, Equatable {
+public enum LoggerLevel: Int, CaseIterable, Equatable, Sendable {
     case didabled
     case debug
     case info
@@ -46,7 +45,7 @@ extension LoggerLevel: CustomStringConvertible {
 }
 
 /// Context for debugging
-public protocol ContextProtocol {
+public protocol ContextProtocol: Sendable {
     var name: String { get }    
 }
 
@@ -66,7 +65,7 @@ extension ContextProtocol where Self: Equatable {
 }
 
 /// The logger service protocol
-public protocol LoggerServiceProtocol {
+public protocol LoggerServiceProtocol: Sendable {
     /// Minimum loggger level by default is error
     var minLoggerLevel: LoggerLevel { get }
     /**
@@ -87,21 +86,25 @@ public protocol LoggerServiceProtocol {
     /**
      The context of logging
      */
-    var logContexts: [ContextProtocol] { get }
+    var logContexts: [any ContextProtocol] { get }
     
     /**
      Log function
      */
-    func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel)
+    func log(_ message: @escaping @Sendable @autoclosure () -> String, level: LoggerLevel)
     
     /**
      Log function with context
      */
-    func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol)
+    func log(
+        _ message: @escaping @Sendable @autoclosure () -> String,
+        level: LoggerLevel,
+        context: any ContextProtocol
+    )
 }
 
 extension LoggerServiceProtocol {
-    func shouldLog(context: ContextProtocol) -> Bool {
+    func shouldLog(context: any ContextProtocol) -> Bool {
         return logContexts.contains(where: { $0.name == context.name} )
     }
 
@@ -127,11 +130,18 @@ extension LoggerServiceProtocol where Self: Equatable {
 
 extension LoggerServiceProtocol {
     
-    public var logContexts: [ContextProtocol] {
+    public var logContexts: [any ContextProtocol] {
         return []
     }
     
-    public func log(_ message: @autoclosure () -> String, level: LoggerLevel, file: String = #file, line: UInt = #line, column: UInt = #column, function: String = #function) {
+    public func log(
+        _ message: @autoclosure () -> String,
+        level: LoggerLevel,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column,
+        function: String = #function
+    ) {
         var debug = ""
         #if os(Linux)
         debug += "\(level.color) "
@@ -145,7 +155,12 @@ extension LoggerServiceProtocol {
         print(debug)
     }
     
-    public func log(_ message: @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol, sourceLocation: SourceLocation) {
+    public func log(
+        _ message: @autoclosure () -> String,
+        level: LoggerLevel,
+        context: any ContextProtocol,
+        sourceLocation: SourceLocation
+    ) {
         var debug = ""
         #if os(Linux)
         debug += "\(level.color) "
@@ -159,8 +174,7 @@ extension LoggerServiceProtocol {
         print(debug)
     }
 
-    public func debug(_ error: Debuggable) {
+    public func debug(_ error: any Debuggable) {
         print(error.debugDescription)
     }
 }
-#endif

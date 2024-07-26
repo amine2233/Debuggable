@@ -1,21 +1,20 @@
-#if canImport(Foundation)
 import Foundation
 
-public struct SourceLocation {
+public struct SourceLocation: Sendable {
     /// File in which this location exists.
-    public var file: String
+    public let file: String
     
     /// Function in which this location exists.
-    public var function: String
+    public let function: String
     
     /// Line number this location belongs to.
-    public var line: UInt
+    public let line: UInt
     
     /// Number of characters into the line this location starts at.
-    public var column: UInt
+    public let column: UInt
     
     /// Optional start/end range of the source.
-    public var range: Range<UInt>?
+    public let range: Range<UInt>?
     
     /// Creates a new `SourceLocation`
     init(file: String, function: String, line: UInt, column: UInt, range: Range<UInt>?) {
@@ -35,8 +34,7 @@ extension SourceLocation {
         line: UInt = #line,
         column: UInt = #column,
         range: Range<UInt>? = nil
-        ) -> SourceLocation {
+    ) -> SourceLocation {
         return SourceLocation(file: file, function: function, line: line, column: column, range: range)
     }
 }
-#endif

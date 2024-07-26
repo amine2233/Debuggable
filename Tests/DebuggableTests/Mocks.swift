@@ -1,7 +1,7 @@
 @testable import Debuggable
 import Foundation
 
-final class LoggerQueueMock: LoggerQueue {
+final class LoggerQueueMock: LoggerQueue, @unchecked Sendable {
     var invokedAsync = false
     var invokedAsyncCount = 0
     var invokedAsyncParameters: (group: DispatchGroup?, qos: DispatchQoS, flags: DispatchWorkItemFlags)?
@@ -19,7 +19,7 @@ final class LoggerQueueMock: LoggerQueue {
     }
 }
 
-final class LoggerServiceMock: LoggerServiceProtocol {
+final class LoggerServiceMock: LoggerServiceProtocol, @unchecked Sendable {
 
     var invokedMinLoggerLevelGetter = false
     var invokedMinLoggerLevelGetterCount = 0
@@ -144,7 +144,7 @@ final class LoggerServiceMock: LoggerServiceProtocol {
     }
 }
 
-final class ContextMock: ContextProtocol {
+final class ContextMock: ContextProtocol, @unchecked Sendable {
     var invokedNameGetter = false
     var invokedNameGetterCount = 0
     var stubbedName: String! = ""
@@ -156,7 +156,7 @@ final class ContextMock: ContextProtocol {
     }
 }
 
-final class DebuggableMock: Debuggable {
+final class DebuggableMock: Debuggable, @unchecked Sendable {
     var invokedIdentifierGetter = false
     var invokedIdentifierGetterCount = 0
     var stubbedIdentifier: String! = ""
