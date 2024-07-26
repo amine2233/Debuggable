@@ -19,12 +19,12 @@ public struct LoggerService: LoggerServiceProtocol, Equatable {
                 enable: Bool = false,
                 minLoggerLevel: LoggerLevel = .didabled,
                 queue: any LoggerQueue = DispatchQueue.global(),
-                bundle: Bundle = .main) {
+                bundleIdentifier: String? = Bundle.main.bundleIdentifier) {
         self.name = name
         self.isEnabled = enable
         self.minLoggerLevel = minLoggerLevel
         self.queue = queue
-        self.bundleIdentifier = bundle.bundleIdentifier
+        self.bundleIdentifier = bundleIdentifier
     }
     
     /**
