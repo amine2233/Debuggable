@@ -19,7 +19,36 @@ final class LoggerQueueMock: LoggerQueue, @unchecked Sendable {
     }
 }
 
-final class LoggerServiceMock: LoggerServiceProtocol, @unchecked Sendable {
+final class LoggerServiceMock: LoggerService, @unchecked Sendable {    
+    var invokedServices = false
+    var invokedServicesCount = 0
+    var stubbedServices: [any LoggerService]!
+
+    var services: [any LoggerService] {
+        invokedServices = true
+        invokedServicesCount += 1
+        return stubbedServices
+    }
+
+    var invokedLoggerColorConfiguration = false
+    var invokedLoggerColorConfigurationCount = 0
+    var stubbedLoggerColorConfigurationLevel: LoggerColorConfiguration!
+
+    var loggerColorConfiguration: LoggerColorConfiguration? {
+        invokedLoggerColorConfiguration = true
+        invokedLoggerColorConfigurationCount += 1
+        return stubbedLoggerColorConfigurationLevel
+    }
+    
+    var invokedLoggerDescriptionConfiguration = false
+    var invokedLoggerDescriptionConfigurationCount = 0
+    var stubbedLoggerDescriptionConfigurationLevel: LoggerDescriptionConfiguration!
+
+    var loggerDescriptionConfiguration: LoggerDescriptionConfiguration? {
+        invokedLoggerDescriptionConfiguration = true
+        invokedLoggerDescriptionConfigurationCount += 1
+        return stubbedLoggerDescriptionConfigurationLevel
+    }
 
     var invokedMinLoggerLevelGetter = false
     var invokedMinLoggerLevelGetterCount = 0
@@ -75,9 +104,9 @@ final class LoggerServiceMock: LoggerServiceProtocol, @unchecked Sendable {
 
     var invokedLogContextsGetter = false
     var invokedLogContextsGetterCount = 0
-    var stubbedLogContexts: [ContextProtocol]! = []
+    var stubbedLogContexts: [LoggerContext]! = []
 
-    var logContexts: [ContextProtocol] {
+    var logContexts: [LoggerContext] {
         invokedLogContextsGetter = true
         invokedLogContextsGetterCount += 1
         return stubbedLogContexts
@@ -101,11 +130,11 @@ final class LoggerServiceMock: LoggerServiceProtocol, @unchecked Sendable {
 
     var invokedLogLevel = false
     var invokedLogLevelCount = 0
-    var invokedLogLevelParameters: (level: LoggerLevel, context: ContextProtocol)?
-    var invokedLogLevelParametersList = [(level: LoggerLevel, context: ContextProtocol)]()
+    var invokedLogLevelParameters: (level: LoggerLevel, context: LoggerContext)?
+    var invokedLogLevelParametersList = [(level: LoggerLevel, context: LoggerContext)]()
     var shouldInvokeLogLevelMessage = false
 
-    func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: ContextProtocol) {
+    func log(_ message: @escaping @autoclosure () -> String, level: LoggerLevel, context: LoggerContext) {
         invokedLogLevel = true
         invokedLogLevelCount += 1
         invokedLogLevelParameters = (level, context)
@@ -142,9 +171,21 @@ final class LoggerServiceMock: LoggerServiceProtocol, @unchecked Sendable {
         invokedDebugParameters = (error, ())
         invokedDebugParametersList.append((error, ()))
     }
+    
+    func add(service: any LoggerService) {
+        
+    }
+    
+    func remove(service: any LoggerService) {
+        
+    }
+    
+    func enable(_ value: Bool, name: String) {
+        
+    }
 }
 
-final class ContextMock: ContextProtocol, @unchecked Sendable {
+final class ContextMock: LoggerContext, @unchecked Sendable {
     var invokedNameGetter = false
     var invokedNameGetterCount = 0
     var stubbedName: String! = ""

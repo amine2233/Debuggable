@@ -17,7 +17,13 @@ public struct SourceLocation: Sendable {
     public let range: Range<UInt>?
     
     /// Creates a new `SourceLocation`
-    init(file: String, function: String, line: UInt, column: UInt, range: Range<UInt>?) {
+    init(
+        file: String,
+        function: String,
+        line: UInt,
+        column: UInt,
+        range: Range<UInt>?
+    ) {
         self.file = file
         self.function = function
         self.line = line
