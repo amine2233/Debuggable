@@ -36,9 +36,6 @@ final class LoggerServiceTests: XCTestCase {
         service = LoggerServiceMock()
         service.stubbedLoggerColorConfigurationLevel = color
         service.stubbedLoggerDescriptionConfigurationLevel = .default
-        #if os(Linux)
-        service.loggerColorConfiguration = .linux
-        #endif
         contextMock = ContextMock()
     }
 
