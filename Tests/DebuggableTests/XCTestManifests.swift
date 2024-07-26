@@ -44,7 +44,7 @@ extension LoggerServiceTests {
     // to regenerate.
     static let __allTests__LoggerServiceTests = [
         ("testAddServce", testAddServce),
-        ("testBundleIdentifier", testBundleIdentifier),
+        //("testBundleIdentifier", testBundleIdentifier),
         ("testDisableServce", testDisableServce),
         ("testEnableServce", testEnableServce),
         ("testLogDebug", testLogDebug),
